@@ -1,0 +1,75 @@
+var { server } = require(process.cwd() + '/dist/api/app.bootstrap');
+
+var request = require('supertest');
+var fixtures = require('./fixtures');
+var expect = require('chai').expect;
+
+var { doRequest, doQueryRequest, doFormRequest, expectations, dataOk, pools } = require('./utils');
+
+describe("{{ENTITY_CAPITALIZE}} routes", function () {
+  
+  var agent, password, credentials, token, unauthorizedToken, user;
+
+  before(function (done) {
+
+    agent       = request(server);
+    password    = 'e2q2mak7';
+    credentials = fixtures.user.entity('admin', password);
+
+    doRequest(agent, 'post', '/api/v1/auth/register', null, null, credentials, 201, function(err, res) {
+      expect(res.statusCode).to.eqls(201);
+      token = res.body.token.accessToken;
+      user = res.body.user;
+      doRequest(agent, 'post', '/api/v1/auth/register', null, null, fixtures.user.entity('user', password), 201, function(err, res) {
+        expect(res.statusCode).to.eqls(201);
+        unauthorizedToken = res.body.token.accessToken;
+        done();
+      });
+    });
+
+  });
+  
+  after(function () {
+    server.close();
+    server = undefined;
+    delete server;
+  });
+
+  it('POST /api/v1/{{ENTITY_PLURALIZE}} succeed with 201', function (done) {
+    doRequest(agent, 'post', '/api/v1/{{ENTITY_PLURALIZE}}', null, null, {/*TODO payload*/}, 201, function(err, res) {
+      expect(res.statusCode).to.eqls(201);
+      id = res.body.id;
+      done();
+    });
+  });
+
+  it('GET /api/v1/{{ENTITY_PLURALIZE}}/n succeed with 200', function (done) {
+    doQueryRequest(agent, '/api/v1/{{ENTITY_PLURALIZE}}', id, token, {}, 200, function(err, res) {
+      expect(res.statusCode).to.eqls(200);
+      done();
+    });
+  });
+
+  it('PUT /api/v1/{{ENTITY_PLURALIZE}}/n succeed with 200', function (done) {
+    doRequest(agent, 'put', '/api/v1/{{ENTITY_PLURALIZE}}', id, null, {/*TODO payload*/}, 200, function(err, res) {
+      expect(res.statusCode).to.eqls(200);
+      done();
+    });
+  });
+
+  it('PATCH /api/v1/{{ENTITY_PLURALIZE}}/n succeed with 200', function (done) {
+    doRequest(agent, 'patch', '/api/v1/{{ENTITY_PLURALIZE}}', id, null, {/*TODO payload*/}, 200, function(err, res) {
+      expect(res.statusCode).to.eqls(200);
+      done();
+    });
+  });
+
+  it('DELETE /api/v1/{{ENTITY_PLURALIZE}}/n succeed with 204', function (done) {
+    agent
+      .delete('/api/v1/{{ENTITY_PLURALIZE}}/' + id)
+      .set('Authorization', 'Bearer ' + token)
+      .set('Origin', process.env.ORIGIN)
+      .set('Content-Type', process.env.CONTENT_TYPE)
+      .expect(204, done);
+  });
+});

@@ -1,0 +1,120 @@
+import { CREATED, NO_CONTENT } from "http-status";
+import * as Moment from "moment"
+
+import { Request, Response } from "express";
+import { Container } from "@config/container.config";
+import { {{ENTITY_CAPITALIZE}} } from "@models/{{ENTITY_LOWERCASE}}.model";
+import { {{ENTITY_CAPITALIZE}}Repository } from "@repositories/{{ENTITY_LOWERCASE}}.repository";
+import { getRepository, getCustomRepository } from "typeorm";
+import { Controller } from "@bases/controller.class";
+import { checkDatabaseError } from "@utils/error.util";
+
+/**
+ * @class {{ENTITY_CAPITALIZE}}Controller 
+ * @extends Controller
+ * 
+ * @description Manage incoming requests for api/v1/{{ENTITY_PLURALIZE}}
+ * 
+ * @inheritdoc
+ */
+export class {{ENTITY_CAPITALIZE}}Controller extends Controller {
+
+  /** */
+  constructor() { super(); }
+
+  /**
+   * Get serialized {{ENTITY_LOWERCASE}}
+   * 
+   * @param {Request} req Express request object derived from http.incomingMessage
+   * @param {Response} res Express response object
+   * @param {Function} next Callback function
+   * 
+   * @public
+   */
+  public async get(req: Request, res : Response, next: Function) { 
+    try {
+      const repository = getRepository({{ENTITY_CAPITALIZE}});
+      const {{ENTITY_LOWERCASE}} = await repository.findOneOrFail(req.params.{{ENTITY_LOWERCASE}}Id);
+      res.locals.data = {{ENTITY_LOWERCASE}};
+      next();
+    } catch(e) { next( checkDatabaseError( e ) ); }
+  }
+
+  /**
+   * Create new {{ENTITY_LOWERCASE}}
+   * 
+   * @param {Request} req Express request object derived from http.incomingMessage
+   * @param {Response} res Express response object
+   * @param {Function} next Callback function
+   * 
+   * @public
+   */
+  public async create (req: Request, res : Response, next: Function) {
+    try {
+      const repository = getRepository({{ENTITY_CAPITALIZE}});
+      const {{ENTITY_LOWERCASE}} = new {{ENTITY_CAPITALIZE}}(req.body);
+      const saved{{ENTITY_CAPITALIZE}} = await repository.save({{ENTITY_LOWERCASE}});
+      res.status( CREATED );
+      res.locals.data = saved{{ENTITY_CAPITALIZE}};
+      next();
+    } catch(e) { next( checkDatabaseError( e ) ); }
+  }
+
+  /**
+   * Update existing {{ENTITY_LOWERCASE}}
+   * 
+   * @param {Request} req Express request object derived from http.incomingMessage
+   * @param {Response} res Express response object
+   * @param {Function} next Callback function
+   * 
+   * @public
+   */
+  public async update (req: Request, res : Response, next: Function) {
+    try {
+      const repository = getRepository({{ENTITY_CAPITALIZE}});
+      const {{ENTITY_LOWERCASE}} = await repository.findOneOrFail(req.params.{{ENTITY_LOWERCASE}}Id);
+      {{ENTITY_LOWERCASE}}.updatedAt = Moment( new Date() ).format('YYYY-MM-DD HH:ss');
+      repository.merge({{ENTITY_LOWERCASE}}, req.body);
+      repository.save({{ENTITY_LOWERCASE}});
+      res.locals.data = {{ENTITY_LOWERCASE}};
+      next();
+    } catch(e) { next( checkDatabaseError( e ) ); }
+  };
+
+  /**
+   * Get {{ENTITY_LOWERCASE}} list
+   * 
+   * @param {Request} req Express request object derived from http.incomingMessage
+   * @param {Response} res Express response object
+   * @param {Function} next Callback function
+   * 
+   * @public
+   */
+  public async list (req: Request, res : Response, next: Function) {
+    try {
+      const repository = getCustomRepository({{ENTITY_CAPITALIZE}}Repository);
+      res.locals.data = await repository.list(req.query);
+      next();
+    } catch(e) { next( checkDatabaseError( e ) ); }
+  }
+
+  /**
+   * Delete {{ENTITY_LOWERCASE}}
+   * 
+   * @param {Request} req Express request object derived from http.incomingMessage
+   * @param {Response} res Express response object
+   * @param {Function} next Callback function
+   * 
+   * @public
+   */
+  public async remove (req: Request, res : Response, next: Function) {
+    try {
+      const {{ENTITY_LOWERCASE}}Repository = getRepository({{ENTITY_CAPITALIZE}});
+      const {{ENTITY_LOWERCASE}} = await {{ENTITY_LOWERCASE}}Repository.findOneOrFail(req.params.{{ENTITY_LOWERCASE}}Id);
+      const repository = getRepository({{ENTITY_CAPITALIZE}});
+      await repository.remove({{ENTITY_LOWERCASE}});
+      res.status(NO_CONTENT);
+      next();
+    } catch(e) { next( checkDatabaseError( e ) ); }
+  }
+}

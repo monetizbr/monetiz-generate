@@ -1,0 +1,118 @@
+import { getRepository } from "typeorm";
+import { Container } from "@config/container.config";
+import { Router } from "@bases/router.class";
+import { Guard, ADMIN, LOGGED_USER } from "@middlewares/guard.middleware";
+import { Validator } from "@middlewares/validator.middleware";
+import { Uploader } from "@middlewares/uploader.middleware";
+
+import { list{{ENTITY_PLURALIZE_UP}}, insert{{ENTITY_CAPITALIZE}}, get{{ENTITY_CAPITALIZE}}, replace{{ENTITY_CAPITALIZE}}, update{{ENTITY_CAPITALIZE}}, remove{{ENTITY_CAPITALIZE}} } from "@validations/{{ENTITY_LOWERCASE}}.validation";
+
+export class {{ENTITY_CAPITALIZE}}Router extends Router {
+
+  constructor(){ super(); }
+
+  /**
+   * @description Plug routes definitions
+   */
+  define(): void {
+
+    this.router.route('/')
+
+      /**
+       * @api {get} api/v1/{{ENTITY_PLURALIZE}} List {{ENTITY_PLURALIZE}}
+       * @apiDescription Get a list of {{ENTITY_PLURALIZE}}
+       * @apiVersion 1.0.0
+       * @apiName List{{ENTITY_CAPITALIZE}}
+       * @apiGroup {{ENTITY_CAPITALIZE}}
+       * @apiPermission admin
+       *
+       * @apiUse BaseHeader
+       *
+       * @apiParam  {Number{1-}}         [page=1]     List page
+       * @apiParam  {Number{1-100}}      [perPage=1]  {{ENTITY_CAPITALIZE}}'s per page
+       *
+       * TODO:
+       * 
+       */
+      .get(Guard.authorize([ADMIN, LOGGED_USER]), Validator.validate(list{{ENTITY_PLURALIZE_UP}}), Container.resolve('{{ENTITY_CAPITALIZE}}Controller').list)
+
+      /**
+       * @api {post} api/v1/{{ENTITY_PLURALIZE}} Create {{ENTITY_LOWERCASE}}(s)
+       * @apiDescription Create one or many new {{ENTITY_LOWERCASE}}(s)
+       * @apiVersion 1.0.0
+       * @apiName Create{{ENTITY_CAPITALIZE}}
+       * @apiGroup {{ENTITY_CAPITALIZE}}
+       * @apiPermission user
+       *
+       * @apiUse BaseHeader
+       *
+       * TODO:
+       * 
+       */
+      .post(Guard.authorize([ADMIN, LOGGED_USER]), Validator.validate(insert{{ENTITY_CAPITALIZE}}), Container.resolve('{{ENTITY_CAPITALIZE}}Controller').create);
+
+    this.router.route('/:{{ENTITY_LOWERCASE}}Id')
+
+      /**
+       * @api {get} api/v1/{{ENTITY_PLURALIZE}}/:id Get one {{ENTITY_LOWERCASE}}
+       * @apiDescription Get {{ENTITY_LOWERCASE}}
+       * @apiVersion 1.0.0
+       * @apiName Get{{ENTITY_CAPITALIZE}}
+       * @apiGroup {{ENTITY_CAPITALIZE}}
+       * @apiPermission user
+       *
+       * @apiUse BaseHeader
+       *
+       * TODO: 
+       */
+      .get(Guard.authorize([ADMIN, LOGGED_USER]), Validator.validate(get{{ENTITY_CAPITALIZE}}), Container.resolve('{{ENTITY_CAPITALIZE}}Controller').get)
+
+      /**
+       * @api {put} api/v1/{{ENTITY_PLURALIZE}}/:id Replace {{ENTITY_LOWERCASE}}
+       * @apiDescription Replace the whole {{ENTITY_LOWERCASE}} with a new one
+       * @apiVersion 1.0.0
+       * @apiName Replace{{ENTITY_CAPITALIZE}}
+       * @apiGroup {{ENTITY_CAPITALIZE}}
+       * @apiPermission user
+       *
+       * @apiUse BaseHeader
+       *
+       * TODO:
+       */
+      .put(Guard.authorize([ADMIN, LOGGED_USER]), Validator.validate(replace{{ENTITY_CAPITALIZE}}), Container.resolve('{{ENTITY_CAPITALIZE}}Controller').update)
+
+      /**
+       * @api {patch} api/v1/{{ENTITY_PLURALIZE}}/:id Update {{ENTITY_LOWERCASE}}
+       * @apiDescription Update some fields of a {{ENTITY_LOWERCASE}}
+       * @apiVersion 1.0.0
+       * @apiName Update{{ENTITY_CAPITALIZE}}
+       * @apiGroup {{ENTITY_CAPITALIZE}}
+       * @apiPermission user
+       *
+       * @apiUse BaseHeader
+       *
+       * TODO:
+       */
+      .patch(Guard.authorize([ADMIN, LOGGED_USER]), Validator.validate(update{{ENTITY_CAPITALIZE}}), Container.resolve('{{ENTITY_CAPITALIZE}}Controller').update)
+
+      /**
+       * @api {delete} api/v1/{{ENTITY_PLURALIZE}}/:id Delete {{ENTITY_LOWERCASE}}
+       * @apiDescription Delete a {{ENTITY_LOWERCASE}}
+       * @apiVersion 1.0.0
+       * @apiName Delete{{ENTITY_CAPITALIZE}}
+       * @apiGroup {{ENTITY_CAPITALIZE}}
+       * @apiPermission user
+       *
+       * @apiUse BaseHeader
+       *
+       * @apiError (Bad request 400)   ValidationError    Some parameters may contain invalid values
+       * @apiError (Unauthorized 401)  Unauthorized       Only authenticated users can access the data
+       * @apiError (Forbidden 403)     Forbidden          Only admins can access the data
+       * @apiError (Not Found 404)     NotFound           {{ENTITY_CAPITALIZE}} does not exist
+       * 
+       * TODO:
+       */
+      .delete(Guard.authorize([ADMIN, LOGGED_USER]), Validator.validate(remove{{ENTITY_CAPITALIZE}}), Container.resolve('{{ENTITY_CAPITALIZE}}Controller').remove);
+
+  }
+}
